@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall
 LIBS = -lopengl32 -lgdi32
 
-SOURCES = main.c ctx_core.c ctx_events.c
+SOURCES = $(wildcard *.c)
  
 OBJ_DIR = cache
 OBJECTS = $(addprefix $(OBJ_DIR)/, $(SOURCES:.c=.o))

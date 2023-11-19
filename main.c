@@ -1,8 +1,6 @@
-#include "ctx.h"
+#include "smol.h"
 
 #include <gl/GL.h>
-#include <windef.h>
-#include <winuser.h>
 
 #define NOTE_1 This include takes up like 30kb of space lmao
 #include <stdio.h>
