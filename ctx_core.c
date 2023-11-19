@@ -30,8 +30,8 @@ static inline char* Smol__GenerateWindowHandleClassName(const char* windowTitle)
     return s;
 }
 
-WndCtx* SmolCreateContext(const char* title, int width, int height) {
-    char* className = Smol__GenerateWindowHandleClassName(title);
+WndCtx* SmolCreateContext(const char* windowTitle, int width, int height) {
+    char* className = Smol__GenerateWindowHandleClassName(windowTitle);
 
     // Register Window class
     WNDCLASS wc = {};
@@ -44,7 +44,7 @@ WndCtx* SmolCreateContext(const char* title, int width, int height) {
     HWND hwnd = CreateWindowEx(
         0,
         className,
-        title,
+        windowTitle,
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, width, height,
         NULL, NULL, GetModuleHandle(NULL), NULL
@@ -86,7 +86,7 @@ WndCtx* SmolCreateContext(const char* title, int width, int height) {
         .wndClass = wc,
         .wglContext = hglrc,
         .handle = hwnd,
-        .m_WindowResizeCallback = Smol__DefaultWindowResizeCallback
+        .m_WindowResizeCallback = Smol__DefaultClientSizeCallback
     };
 
     free(className);
@@ -110,17 +110,20 @@ bool SmolContextShouldClose(WndCtx *ctx) {
     return !GetMessage(&ctx->m_state__eventmsg, NULL, 0, 0);
 }
 
-#define RectEquals(rect1, rect2) (rect1.bottom == rect2.bottom\
-                                && rect1.top == rect2.top\
-                                && rect1.left == rect2.left\
-                                && rect1.right == rect2.right)
-static inline void Smol__DetermineClientSizeChangeCallback(WndCtx* ctx) {
-    static RECT state_snapshot_clientsize;
+#define RectResolutionEquals(rect1, rect2) (rect1.bottom - rect1.top == rect2.bottom - rect2.top\
+                                && rect1.right - rect1.left == rect2.right - rect2.left)
+#define RectResolutionHorizontal(rect) (rect.right - rect.left)
+#define RectResolutionVertical(rect) (rect.bottom - rect.top)
+
+/// Dev note: Determines whether to call the OnClientSizeUpdated event callback.
+static inline void Smol__CheckOnClientSizeUpdated(WndCtx* ctx) {
     RECT rect;
     GetClientRect(ctx->handle, &rect);
-    if (!RectEquals(state_snapshot_clientsize, rect)) {
-        ctx->m_WindowResizeCallback(ctx, rect.right - rect.left, rect.bottom - rect.top);
-        state_snapshot_clientsize = rect;
+    if (!RectResolutionEquals(ctx->m_state_clientsize, rect)) {
+        ctx->m_WindowResizeCallback(ctx, 
+            RectResolutionHorizontal(rect),
+            RectResolutionVertical(rect));
+        ctx->m_state_clientsize = rect;
     }
 }
 
@@ -129,5 +132,5 @@ void SmolHandleEvents(WndCtx *ctx) {
     DispatchMessage(&ctx->m_state__eventmsg);
 
     // TODO: We do not want to run every single callback every single frame. Find a way to snapshot the state and compare.
-    Smol__DetermineClientSizeChangeCallback(ctx);
+    if (ctx->m_WindowResizeCallback) Smol__CheckOnClientSizeUpdated(ctx);
 }

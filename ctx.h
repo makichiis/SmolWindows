@@ -20,6 +20,7 @@ struct NativeWindowContext {
 
     MSG                         m_state__eventmsg;
 
+    RECT                        m_state_clientsize;
     SmolWindowResizeCallback    m_WindowResizeCallback;
 };
 
@@ -32,12 +33,12 @@ typedef struct NativeWindowContext WndCtx;
  * @brief Initialize a native window context. Allocates memory, which should be freed when the context
  is no longer necessary using `SmolDestroyContext(WndCtx*)`.
  * 
- * @param windowName The title of the window/
+ * @param windowTitle The title of the window/
  * @param width The width (in pixels) of the window.
  * @param height The height (in pixels) of the window.
  * @return WndCtx* A new window context. Will return NULL if unsuccessful.
  */
-WndCtx* SmolCreateContext(const char* windowName, int width, int height);
+WndCtx* SmolCreateContext(const char* windowTitle, int width, int height);
 
 
 // -- Core context functions 
@@ -85,17 +86,18 @@ void SmolHandleEvents(WndCtx* ctx);
  via a call to `glViewport()`. Overriding this behavior will not preserve viewport scaling.
  * 
  * @param window - The window context `cb` will be attached to.
- * @param cb - The callback.
+ * @param cb - The callback. If set to NULL, nothing will happen in this event.
  */
-static inline void SmolSetWindowResizeCallback(WndCtx* window, void (*cb)(WndCtx*, int width, int height)) {
+static inline void SmolOnClientSizeUpdated(WndCtx* window, void (*cb)(WndCtx*, int width, int height)) {
     window->m_WindowResizeCallback = cb;
 }
 
 
 // -- Default callbacks
 
-/// For internal use only. The default window process callback.
+/// For internal use only. The default base window process callback.
 LRESULT CALLBACK Smol__DefaultWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void Smol__DefaultWindowResizeCallback(WndCtx* window, int width, int height);
+/// For internal user only. The default window resize callback, though it can be overriden via `SmolSetWindowResizeCallback()`.
+void Smol__DefaultClientSizeCallback(WndCtx* window, int width, int height);
 
 #endif
