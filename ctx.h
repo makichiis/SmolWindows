@@ -11,7 +11,7 @@ typedef HWND CtxWindowHandle;
 
 struct NativeWindowContext;
 
-typedef void (*SmolWindowResizeCallback)(struct NativeWindowContext*, int width, int height);
+typedef void (*SmolClientSizeCallback)(struct NativeWindowContext*, int width, int height);
 
 struct NativeWindowContext {
     CtxWndClass                 wndClass;
@@ -21,7 +21,7 @@ struct NativeWindowContext {
     MSG                         m_state__eventmsg;
 
     RECT                        m_state_clientsize;
-    SmolWindowResizeCallback    m_WindowResizeCallback;
+    SmolClientSizeCallback      m_WindowResizeCallback;
 };
 
 typedef struct NativeWindowContext WndCtx;
