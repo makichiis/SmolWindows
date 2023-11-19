@@ -18,7 +18,7 @@ static inline char* Smol__GenerateWindowHandleClassName(const char* windowTitle)
     return s;
 }
 
-WndCtx* SmolCreateContext(const char* windowTitle, int width, int height) {
+SmolWindow* SmolCreateContext(const char* windowTitle, int width, int height) {
     char* className = Smol__GenerateWindowHandleClassName(windowTitle);
 
     // Register Window class
@@ -67,26 +67,26 @@ WndCtx* SmolCreateContext(const char* windowTitle, int width, int height) {
     HGLRC hglrc = wglCreateContext(hdc);
     //wglMakeCurrent(hdc, hglrc);
 
-    WndCtx* ctx = malloc(sizeof *ctx);
+    SmolWindow* ctx = malloc(sizeof *ctx);
     if (!ctx) return NULL;
     
-    *ctx = (WndCtx) {
+    *ctx = (SmolWindow) {
         .wndClass = wc,
         .wglContext = hglrc,
         .handle = hwnd,
-        .mState__TimerID = SetTimer(hwnd, 1, 16, NULL),
-        .mClientSizeUpdatedCallback = Smol__DefaultClientSizeUpdatedCallback
+        .mWindows__TimerID = SetTimer(hwnd, 1, 16, NULL),
+        .mOnClientSizeUpdated = Smol__DefaultClientSizeUpdatedCallback
     };
 
     free(className);
     return ctx;
 }
 
-void SmolMakeContextCurrent(WndCtx *ctx) {
+void SmolMakeContextCurrent(SmolWindow *ctx) {
     wglMakeCurrent(GetDC(ctx->handle), ctx->wglContext);
 }
 
-void SmolDestroyContext(WndCtx* ctx) {
+void SmolDestroyContext(SmolWindow* ctx) {
     wglMakeCurrent(NULL, NULL);
     wglDeleteContext(ctx->wglContext);
 

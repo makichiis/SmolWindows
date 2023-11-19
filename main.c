@@ -55,7 +55,7 @@ void DrawCube() {
 }
 
 int main() {
-    WndCtx* window = SmolCreateContext("Smol window :3", 800, 600);
+    SmolWindow* window = SmolCreateContext("Smol window :3", 800, 600);
     if (!window) {
         perror("Window context could not be opened.");
         return 1;
@@ -80,7 +80,7 @@ int main() {
 
         glPopMatrix();
 
-        //Sleep(10);
+        Sleep(10);
         SmolHandleEvents(window);
         SwapBuffers(wglGetCurrentDC());
     }
