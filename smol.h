@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 
+#include <basetsd.h>
 #include <stdbool.h>
 
 typedef WNDCLASS CtxWndClass;
@@ -30,6 +31,7 @@ struct NativeWindowContext {
 
     /// Internal state variable for Windows handle processing
     MSG                                 mState__EventMsg;
+    UINT_PTR                            mState__TimerID;
 
     /// State variables for function callbacks
     RECT                                mState__ClientSize;

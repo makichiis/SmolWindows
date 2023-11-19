@@ -1,11 +1,58 @@
 #include "smol.h"
 
 #include <gl/GL.h>
+#include <gl/GLU.h>
+#include <math.h>
+#include <minwinbase.h>
+#include <synchapi.h>
 
 #define NOTE_1 This include takes up like 30kb of space lmao
 #include <stdio.h>
 
+#define PI 3.14159265358979323846
+
 void RenderTest();
+
+void DrawCube() {
+    glBegin(GL_QUADS);
+    // Front face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
+
+    // Back face
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+
+    // Left face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
+
+    // Right face
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+
+    // Top face
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+
+    // Bottom face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
+
+    glEnd();
+}
 
 int main() {
     WndCtx* window = SmolCreateContext("Smol window :3", 800, 600);
@@ -15,11 +62,27 @@ int main() {
     }
     SmolMakeContextCurrent(window);
 
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
     // main loop
     while (!SmolContextShouldClose(window)) {
-        SmolHandleEvents(window);
 
-        RenderTest();
+        SYSTEMTIME time; GetLocalTime(&time);
+        float angle = (float)(time.wSecond * 1000 + time.wMilliseconds) / 1000;
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glPushMatrix();
+        glRotatef(angle * 50, 1.0f, 0.3f, 0.1f);
+
+        glColor3f(1.0, 1.0, 1.0);
+        DrawCube();
+
+        glPopMatrix();
+
+        //Sleep(10);
+        SmolHandleEvents(window);
+        SwapBuffers(wglGetCurrentDC());
     }
 
     SmolDestroyContext(window);

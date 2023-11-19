@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <winuser.h>
 
 #define WINDOW_HANDLE_CLASS_NAME_PREFIX "SmolContextWindow-"
 /// For internal use. In `SmolCreateContext`, memory pointed to by return value is freed before end of function.
@@ -22,7 +23,7 @@ WndCtx* SmolCreateContext(const char* windowTitle, int width, int height) {
 
     // Register Window class
     WNDCLASS wc = {};
-    wc.lpfnWndProc = Smol__DefaultWndProc;
+    wc.lpfnWndProc = Smol__DefaultWndProc; // DEFAULT WND PROC WAS REPLACED HERE
     wc.hInstance = GetModuleHandle(NULL);
     wc.lpszClassName = className;
     RegisterClass(&wc);
@@ -73,6 +74,7 @@ WndCtx* SmolCreateContext(const char* windowTitle, int width, int height) {
         .wndClass = wc,
         .wglContext = hglrc,
         .handle = hwnd,
+        .mState__TimerID = SetTimer(hwnd, 1, 16, NULL),
         .mClientSizeUpdatedCallback = Smol__DefaultClientSizeUpdatedCallback
     };
 

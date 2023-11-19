@@ -25,6 +25,17 @@ void SmolHandleEvents(WndCtx *ctx) {
     TranslateMessage(&ctx->mState__EventMsg);
     DispatchMessage(&ctx->mState__EventMsg);
 
-    // TODO: We do not want to run every single callback every single frame. Find a way to snapshot the state and compare.
     if (ctx->mClientSizeUpdatedCallback) Smol__CheckOnClientSizeUpdated(ctx);
+}
+
+/// Must remain at bottom of file.
+LRESULT CALLBACK Smol__DefaultWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return 0;
 }

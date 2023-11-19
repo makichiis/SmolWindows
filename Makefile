@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-LIBS = -lopengl32 -lgdi32
+LIBS = -lopengl32 -lgdi32 -lglu32
 
 SOURCES = $(wildcard *.c)
  
